@@ -17,7 +17,6 @@ This project contains the source code, CI/CD pipeline configuration, and design 
 │   ├── order-service/       # Node.js
 │   └── payment-service/     # Python/Flask
 ├── DESIGN.md                # Detailed Pipeline Architecture & Design
-├── VIDEO_SCRIPT.md          # Script for the video presentation
 └── docker-compose.yml       # Local development setup
 ```
 
