@@ -1,0 +1,58 @@
+name: Auth Service CI/CD
+
+on:
+  push:
+    branches: [ main ]
+    paths:
+      - 'services/auth-service/**'
+      - '.github/workflows/auth-service-ci.yml'
+  pull_request:
+    branches: [ main ]
+    paths:
+      - 'services/auth-service/**'
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+    
+    defaults:
+      run:
+        working-directory: ./services/auth-service
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Use Node.js
+      uses: actions/setup-node@v2
+      with:
+        node-version: '14'
+
+    - name: Install dependencies
+      run: npm ci
+
+    - name: Run Tests
+      run: npm test
+
+  build-push-deploy:
+    needs: build-and-test
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
+    
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Build Docker Image
+      run: |
+        cd services/auth-service
+        docker build -t my-registry/auth-service:${{ github.sha }} .
+        # docker login -u ${{ secrets.DOCKER_USER }} -p ${{ secrets.DOCKER_PASSWORD }}
+        # docker push my-registry/auth-service:${{ github.sha }}
+
+    - name: Simulate Deployment to Staging
+      run: echo "Deploying auth-service:${{ github.sha }} to Staging Cluster..."
+
+    - name: Run Integration Tests
+      run: echo "Running API Integration Tests against Staging..."
+
+    - name: Simulate Deployment to Production
+      run: echo "Deploying auth-service:${{ github.sha }} to Production Cluster..."
